@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vitanix Claim Dashboard - รพ.เชียงราย</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; font-family: 'Sarabun', sans-serif; margin: 0; padding: 0; }
+
+body {
+    background-color: #f8fafc;
+    color: #1e293b;
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.dashboard-container { max-width: 1440px; margin: 0 auto; }
+
+.header-banner {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    color: #ffffff;
+    padding: 28px 32px;
+    border-radius: 16px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.header-title h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px; }
+.header-title p { font-size: 14px; opacity: 0.85; font-weight: 300; }
+
+.header-badge {
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 500;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.kpi-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+    border-top: 5px solid #cbd5e1;
+    transition: all 0.2s ease;
+}
+.kpi-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+
+.kpi-card.done { border-top-color: #10b981; }
+.kpi-card.overdue { border-top-color: #ef4444; }
+.kpi-card.not-used { border-top-color: #f59e0b; }
+.kpi-card.in-progress { border-top-color: #6366f1; }
+.kpi-card.total { border-top-color: #3b82f6; }
+
+.kpi-label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.kpi-label { font-size: 13px; color: #64748b; font-weight: 600; }
+
+.kpi-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.badge-done { background-color: #d1fae5; color: #065f46; }
+.badge-overdue { background-color: #fee2e2; color: #991b1b; }
+.badge-not-used { background-color: #fef3c7; color: #92400e; }
+.badge-in-progress { background-color: #e0e7ff; color: #3730a3; }
+.badge-total { background-color: #dbeafe; color: #1e40af; }
+
+.kpi-content { display: flex; justify-content: space-between; align-items: center; }
+.kpi-subcard { flex: 1; text-align: left; }
+.kpi-number { font-size: 30px; font-weight: 700; color: #0f172a; line-height: 1.1; }
+.kpi-unit { font-size: 11px; color: #94a3b8; margin-top: 4px; font-weight: 500; }
+.kpi-divider { width: 1px; height: 40px; background-color: #e2e8f0; margin: 0 16px; }
+
+.data-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    padding: 28px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 24px;
+}
+
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.card-title::before {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 20px;
+    background-color: #3b82f6;
+    border-radius: 3px;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.toolbar-left { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; flex: 1; }
+.toolbar-right { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.search-container { position: relative; flex: 1; max-width: 340px; min-width: 200px; }
+
+.search-input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s ease;
+    color: #334155;
+    background-color: #f8fafc;
+}
+.search-input:focus { border-color: #3b82f6; background-color: #ffffff; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+
+.filter-select {
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #334155;
+    background-color: #f8fafc;
+    outline: none;
+    cursor: pointer;
+}
+.filter-select:focus { border-color: #3b82f6; }
+
+.search-icon-svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; }
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+.btn-primary { background-color: #1e3a8a; color: #fff; }
+.btn-primary:hover { background-color: #1e293b; }
+.btn-outline { background-color: #fff; color: #334155; border: 1px solid #cbd5e1; }
+.btn-outline:hover { background-color: #f1f5f9; }
+.btn-success { background-color: #059669; color: #fff; }
+.btn-success:hover { background-color: #047857; }
+.btn-danger { background-color: #fff; color: #dc2626; border: 1px solid #fecaca; }
+.btn-danger:hover { background-color: #fef2f2; }
+.btn-sm { padding: 6px 10px; font-size: 12px; }
+
+.file-input-hidden { display: none; }
+
+.table-responsive { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; max-height: 640px; overflow-y: auto; }
+
+table { width: 100%; border-collapse: collapse; text-align: left; }
+
+th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    padding: 12px 16px;
+    font-size: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    font-size: 13px;
+    vertical-align: middle;
+}
+td[contenteditable="true"] { cursor: text; }
+td[contenteditable="true"]:hover { background-color: #fffbeb; }
+td[contenteditable="true"]:focus { outline: 2px solid #3b82f6; outline-offset: -2px; background-color: #fff; }
+
+tr:last-child td { border-bottom: none; }
+tr:hover td { background-color: #f8fafc; }
+
+.status-pill { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 30px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.status-pill.done { background-color: #d1fae5; color: #065f46; }
+.status-pill.overdue { background-color: #fee2e2; color: #991b1b; }
+.status-pill.not-used { background-color: #fef3c7; color: #92400e; }
+.status-pill.in-progress { background-color: #e0e7ff; color: #3730a3; }
+
+select.status-select {
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    padding: 4px;
+    border-radius: 6px;
+}
+
+.row-delete-btn {
+    background: none;
+    border: none;
+    color: #cbd5e1;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+}
+.row-delete-btn:hover { color: #ef4444; background-color: #fef2f2; }
+
+.note-banner {
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e3a8a;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.footer { margin-top: 32px; text-align: center; color: #94a3b8; font-size: 12.5px; }
+
+.col-no { width: 50px; text-align: center; }
+.col-status { width: 210px; }
+.col-action { width: 46px; text-align: center; }
+
+@media (max-width: 768px) {
+    .kpi-divider { display: none; }
+    .kpi-content { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .toolbar-left, .toolbar-right { flex-direction: column; align-items: stretch; }
+    .search-container { max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+    <div class="header-banner">
+        <div class="header-title">
+            <h1>Vitanix Claim Summary Dashboard</h1>
+            <p>รายงานสรุปผลการเคลม รพ.เชียงราย • แยกตามสถานะการส่งเบิกของกองทุนหลัก (Distinct) และกองทุนย่อยทั้งหมด</p>
+        </div>
+        <div class="header-badge" id="headerBadge">จำนวนข้อมูลทั้งหมด: 0 รายการ</div>
+    </div>
+
+    <div class="note-banner">
+        ข้อมูลอ้างอิงคอลัมน์ C–H จาก Google Sheet ต้นทาง (รายงานผลเคลมราย Claim Ver.2) • สามารถแก้ไขข้อมูลในตารางได้โดยตรง (คลิกที่ช่องเพื่อพิมพ์แก้ไข) กดปุ่ม "ส่งออก CSV" เพื่อบันทึก หรือ "นำเข้า CSV" เพื่ออัปเดตข้อมูลจากไฟล์ • ตัวเลข KPI ด้านบนคำนวณสดจากตารางด้านล่างเสมอ
+    </div>
+
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <div class="data-card">
+        <div class="card-header-row">
+            <div class="card-title">ตารางแสดงรายละเอียดข้อมูลรายการผลการเคลม</div>
+        </div>
+
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <div class="search-container">
+                    <svg class="search-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="tableSearch" class="search-input" placeholder="ค้นหากองทุนหลัก, กองทุนย่อย, หมวด..." onkeyup="renderTable()">
+                </div>
+                <select id="statusFilter" class="filter-select" onchange="renderTable()">
+                    <option value="all">ทุกสถานะ</option>
+                    <option value="done">1.1 Done</option>
+                    <option value="overdue">2.2 Overdue (กำลังดำเนินการ)</option>
+                    <option value="not-used">5.2 Not Active</option>
+                </select>
+            </div>
+            <div class="toolbar-right">
+                <button class="btn btn-outline btn-sm" onclick="addRow()">+ เพิ่มแถว</button>
+                <button class="btn btn-success btn-sm" onclick="exportCSV()">⬇ ส่งออก CSV</button>
+                <button class="btn btn-primary btn-sm" onclick="document.getElementById('csvFileInput').click()">⬆ นำเข้า CSV</button>
+                <input type="file" id="csvFileInput" class="file-input-hidden" accept=".csv" onchange="importCSV(event)">
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th class="col-no">ลำดับ</th>
+                        <th style="width:22%">รายการสรุปผลสำเร็จการทำงาน</th>
+                        <th style="width:16%">รายละเอียด (กองทุนหลัก)</th>
+                        <th style="width:22%">คำอธิบายเพิ่มเติม1 (กองทุนย่อย)</th>
+                        <th class="col-status">คำอธิบายเพิ่มเติม2 (สถานะส่งเบิก)</th>
+                        <th style="width:12%">คำอธิบายเพิ่มเติม3</th>
+                        <th style="width:12%">คำอธิบายเพิ่มเติม4</th>
+                        <th class="col-action"></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Vitanix Claim Monitoring Dashboard • รพ.เชียงราย • ข้อมูลอ้างอิงจาก Google Sheet คอลัมน์ C–H (แก้ไข/นำเข้า/ส่งออกได้จากหน้านี้)</p>
+    </div>
+</div>
+
+<script>
+const STATUS_META = {
+    'done':     { label: '1.1 Done',    badgeClass: 'done',     kpiLabel: 'สถานะการส่งเบิกได้' },
+    'overdue':  { label: '2.2 Overdue', badgeClass: 'overdue',  kpiLabel: 'กองทุนที่กำลังดำเนินการ' },
+    'not-used': { label: '5.2 Not Active', badgeClass: 'not-used', kpiLabel: 'รพ. ยืนยันไม่มีการใช้งาน' }
+};
+
+function statusCodeFromLabel(label) {
+    if (!label) return 'done';
+    const l = label.toLowerCase();
+    if (l.includes('overdue') || l.includes('inprogress') || l.includes('ดำเนินการ')) return 'overdue';
+    if (l.includes('not active') || l.includes('ไม่มีการใช้งาน') || l.includes('not-used') || l.includes('not used')) return 'not-used';
+    if (l.includes('done')) return 'done';
+    return 'done';
+}
+
+let records = [{"no": 1, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ข้าราชการ OPD", "subFund": "OFC-ผู้ป่วยนอกทั่วไป", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 2, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ข้าราชการ IPD", "subFund": "OFC-ผู้ป่วยในทั่วไป", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 3, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม OPD", "subFund": "SSS-ผู้ป่วยนอกทั่วไป", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 4, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม OPD", "subFund": "เบิกยากดภูมิ", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 5, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม OPD", "subFund": "วัณโรคดื้อยา", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 6, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม OPD", "subFund": "โรคหยุดหายใจขณะหลับ", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 7, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม OPD", "subFund": "ค่าเตรียม ผ่าตัดปลูกถ่ายอวัยวะ", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 8, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม OPD", "subFund": "ค่าเตรียม หลอดเลือด Hemodialysis", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 9, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม OPD", "subFund": "Hemophilia (ยา Factor)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 10, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม OPD", "subFund": "SSO Cancer Care", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 11, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม OPD", "subFund": "รักษาข้อเข่าเสื่อมด้วยพลาสมา (PRGF)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 12, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "SSS-ผู้ป่วยในทั่วไป", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 13, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "Instrument Eclaim", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 14, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "ปลูกถ่ายอวัยวะ (ระหว่างผ่าตัด/หลังผ่าตัด)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 15, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "เปลี่ยนกระจกตา", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 16, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "ผ่าตัดใส่ลูกตาเทียม", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 17, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "One Day Surgery (ODS)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 18, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "Hemophilia (ยา Factor)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 19, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "SSO Cancer Care", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 20, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "Hemodialysis (ไตวายเรื้อรัง)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 21, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "ยานอกบัญชียาหลักแห่งชาติ (E-Claim)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 22, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "จิตเวชผู้ป่วยใน (เกิน 15 วัน)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 23, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "หัตถการกลุ่มโรคหลอดเลือดสมอง (Stroke)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 24, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "ผ่าตัดหัวใจและหลอดเลือด", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 25, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "บริการฉีดวัคชีนคอตีบ-บาดทะยัก (dT) ในผู้ใหญ่", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 26, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "กองทุนผู้ป่วยนอก OP ทั่วไป", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 27, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการกรณีเฉพาะ (Fee Schedule)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 28, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการแพทย์แผนไทย (OP)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 29, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "ค่าบริการดูแลผู้ป่วยจิตเวชในชุมชน", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 30, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการบำบัดทดแทนไต (HD / PD / Erythropoietin)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 31, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการดูแลผู้ป่วยมะเร็งในที่พัก (Cancer Anywhere)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 32, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการดูแลผู้ป่วยระยะสุดท้าย (Palliative Care)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 33, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการทันตกรรมทั่วไป", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 34, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการฟื้นฟูสมรรถภาพด้านการแพทย์ (OP)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 35, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "แว่นตาเด็ก", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 36, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "ตรวจคัดกรองมะเร็งลำไส้ใหญ่ (FIT Test)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 37, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "ตรวจคัดกรองสายตาและสายตาผิดปกติในเด็ก", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 38, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการฝังรากเทียม", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 39, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการผ่าตัดต้อกระจก (Cataract)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 40, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการล้างไตผ่านทางช่องท้องด้วยเครื่องอัตโนมัติ (APD)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 41, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการถุงยางอนามัย", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 42, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการยาเม็ดคุมกำเนิด", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 43, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "ตรวจยีนกุหลาบ (ตรวจคัดกรองดาวน์ซินโดรม)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 44, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "ตรวจคัดกรองพาหะธาลัสซีเมีย", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 45, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการฝากครรภ์ (ANC)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 46, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการตรวจสุขภาพหลังคลอด", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 47, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการคุมกำเนิดกึ่งถาวร (ยาฝัง/ห่วงอนามัย) หลังคลอด/แท้ง", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 48, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการวัคซีนพื้นฐานในเด็ก (EPI)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 49, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "ตรวจคัดกรองโรคการได้ยินในทารกแรกเกิด", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 50, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการตรวจคัดกรองภาวะพร่องฮอร์โมนไทรอยด์ในทารก", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 51, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการให้คำปรึกษาและตรวจหาเชื้อ HIV โดยสมัครใจ (VCT)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 52, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "บริการป้องกันการติดเชื้อ HIV หลังการสัมผัสเชื้อ (PEP)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 53, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC IPD", "subFund": "กองทุนผู้ป่วยใน IP Normal", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 54, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC IPD", "subFund": "บริการผ่าตัดแบบวันเดียวกลับ ODS", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 55, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC IPD", "subFund": "บริการผู้ป่วยในที่บ้าน Home Ward", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 56, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC IPD", "subFund": "บริการผู้ป่วย UCEP 24 ชม.", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 57, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC IPD", "subFund": "Intermediate Care : (IMC)", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 58, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC IPD", "subFund": "ผู้ประกันตนคนพิการ", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 59, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ข้าราชการ อปท. OPD", "subFund": "LGO-ผู้ป่วยนอกทั่วไป", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 60, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ข้าราชการ อปท. IPD", "subFund": "LGO-ผู้ป่วยในทั่วไป", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 61, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ต่างด้าว OPD", "subFund": "MGD-ผู้ป่วยนอกทั่วไป", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 62, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ต่างด้าว IPD", "subFund": "MGD-ผู้ป่วยในทั่วไป", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 63, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "STP", "subFund": "STP-OPD", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 64, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "STP", "subFund": "STP-IPD", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 65, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "Disability", "subFund": "เบิกอุปกรณ์", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 66, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "Disability", "subFund": "บริการฟื้นฟู", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 67, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม OPD", "subFund": "รายการเพิ่มเติม (รอปรับปรุงรายละเอียดจริง) #1", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 68, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม OPD", "subFund": "รายการเพิ่มเติม (รอปรับปรุงรายละเอียดจริง) #2", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 69, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "รายการเพิ่มเติม (รอปรับปรุงรายละเอียดจริง) #3", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 70, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "ประกันสังคม IPD", "subFund": "รายการเพิ่มเติม (รอปรับปรุงรายละเอียดจริง) #4", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 71, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "รายการเพิ่มเติม (รอปรับปรุงรายละเอียดจริง) #5", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 72, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC OPD", "subFund": "รายการเพิ่มเติม (รอปรับปรุงรายละเอียดจริง) #6", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 73, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "UC IPD", "subFund": "รายการเพิ่มเติม (รอปรับปรุงรายละเอียดจริง) #7", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 74, "category": "1.1.2 ดำเนินการสำเร็จแล้ว", "mainFund": "STP", "subFund": "รายการเพิ่มเติม (รอปรับปรุงรายละเอียดจริง) #8", "statusLabel": "1.1 Done", "note3": "", "note4": ""}, {"no": 75, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "ประกันสังคม OPD", "subFund": "เบิกยากดภูมิ", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 76, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "ประกันสังคม OPD", "subFund": "วัณโรคดื้อยา", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 77, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "ประกันสังคม OPD", "subFund": "ค่าเตรียมผ่าตัดปลูกถ่ายอวัยวะ", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 78, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "ประกันสังคม OPD", "subFund": "Hemodialysis เบิกค่าเตรียมหลอดเลือด", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 79, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "ประกันสังคม IPD", "subFund": "รักษาข้อเข่าเสื่อมด้วยพลาสมา (PRGF)", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 80, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "ประกันสังคม IPD", "subFund": "Instrument Eclaim", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 81, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "ประกันสังคม IPD", "subFund": "ปลูกถ่ายอวัยวะ (ระหว่างผ่าตัด/หลังผ่าตัด)", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 82, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "ประกันสังคม IPD", "subFund": "เปลี่ยนกระจกตา", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 83, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "ประกันสังคม IPD", "subFund": "ผ่าตัดใส่ลูกตาเทียม", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 84, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "ประกันสังคม IPD", "subFund": "One Day Surgery (ODS)", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 85, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "ประกันสังคม IPD", "subFund": "Hemophilia (ยา Factor)", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 86, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "ประกันสังคม IPD", "subFund": "Hemodialysis เบิกค่าเตรียมหลอดเลือด", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 87, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "KTP", "subFund": "ตรวจคัดกรองไวรัสตับอักเสบ บี/ซี", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 88, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "KTP", "subFund": "ฉีดวัคซีนป้องกันโรคตามฤดูกาล (7 กลุ่ม)", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 89, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "KTP", "subFund": "บริการตรวจสุขภาพประจำปี (ประกันสังคม)", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 90, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "MOPH CLAIM", "subFund": "บริการตรวจเลือด (โรคเบาหวานและความดันโลหิต)", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 91, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "MOPH CLAIM", "subFund": "บริการให้วัคซีนตามแผนงานเสริมภูมิคุ้มกันโรค (EPI)", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 92, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "MOPH CLAIM", "subFund": "บริการฉีดวัคซีนคอตีบ-บาดทะยัก (dT) ในผู้ใหญ่", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 93, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "ผู้มีปัญหาสถานะสิทธิ ผู้ป่วยนอก", "subFund": "ผู้ป่วยนอกทั่วไป (รอปรับปรุงรายละเอียด)", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 94, "category": "1.1.4 กองทุนที่กำลังดำเนินการ", "mainFund": "ผู้มีปัญหาสถานะสิทธิ ผู้ป่วยนอก", "subFund": "รายการเพิ่มเติม (รอปรับปรุงรายละเอียด)", "statusLabel": "2.2 Overdue", "note3": "", "note4": ""}, {"no": 95, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "UC IPD", "subFund": "Intermediate Care : (IMC)", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 96, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "ข้าราชการ กทม. OPD", "subFund": "BKK-ผู้ป่วยนอกทั่วไป", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 97, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "ข้าราชการ กทม. IPD", "subFund": "BKK-ผู้ป่วยในทั่วไป", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 98, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "ข้าราชการ ขสมก. OPD", "subFund": "BMT-ผู้ป่วยนอกทั่วไป", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 99, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "ข้าราชการ ขสมก. IPD", "subFund": "BMT-ผู้ป่วยในทั่วไป", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 100, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "ต่างด้าว OPD", "subFund": "ผู้ป่วยเด็ก 0-7 ปี ที่มีการฉีดวัคซีน", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 101, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "ต่างด้าว OPD", "subFund": "การให้ยารักษาเอชไอวี/เอดส์ (HIV/AIDS)", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 102, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "ต่างด้าว OPD", "subFund": "การให้ยารักษาการติดเชื้อในสมองสำหรับผู้ติดเชื้อ HIV", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 103, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "ต่างด้าว IPD", "subFund": "การรักษาผู้ป่วยบาดเจ็บทางสมองด้วยการผ่าตัดสมอง", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 104, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "ต่างด้าว IPD", "subFund": "การผ่าตัดหัวใจแบบเปิด", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 105, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "ต่างด้าว IPD", "subFund": "การผ่าตัดหัวใจในโรคหลอดเลือดหัวใจตีบ", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 106, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "ต่างด้าว IPD", "subFund": "การรักษาโรคลิ้นหัวใจโดยใช้บอลลูนผ่านทางผิวหนัง", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 107, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "ต่างด้าว IPD", "subFund": "ขยายหลอดเลือดหัวใจโดยใช้บอลลูน/อุดตันหลอดเลือดหัวใจด้วยหัวกรอ", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 108, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "ต่างด้าว IPD", "subFund": "โรคเยื่อหุ้มสมองอักเสบจากเชื้อรา", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 109, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "ต่างด้าว IPD", "subFund": "การให้ยารักษาการติดเชื้อในสมองสำหรับผู้ติดเชื้อ HIV", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 110, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "ต่างด้าว IPD", "subFund": "การล้างไต/ฟอกเลือดล้างไตกรณีผู้ป่วยไตวายเฉียบพลัน", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 111, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "Disability", "subFund": "บริการ O&M", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}, {"no": 112, "category": "1.1.3 ติดตาม รพ. ยืนยันไม่มีการใช้งาน", "mainFund": "Disability", "subFund": "บริการเข้มข้นสำหรับผู้ป่วย IMC", "statusLabel": "5.2 Not Active", "note3": "", "note4": ""}];
+
+function computeKPI() {
+    const groups = {};
+    for (const code in STATUS_META) groups[code] = { mains: new Set(), sub: 0 };
+    const allMains = new Set();
+    records.forEach(r => {
+        const code = statusCodeFromLabel(r.statusLabel);
+        if (!groups[code]) groups[code] = { mains: new Set(), sub: 0 };
+        if (r.mainFund && r.mainFund.trim()) groups[code].mains.add(r.mainFund.trim());
+        groups[code].sub += 1;
+        if (r.mainFund && r.mainFund.trim()) allMains.add(r.mainFund.trim());
+    });
+    return { groups, totalMains: allMains.size, totalSub: records.length };
+}
+
+function renderKPI() {
+    const { groups, totalMains, totalSub } = computeKPI();
+    const grid = document.getElementById('kpiGrid');
+    let html = '';
+    const order = ['done', 'overdue', 'not-used'];
+    order.forEach(code => {
+        const meta = STATUS_META[code];
+        const g = groups[code] || { mains: new Set(), sub: 0 };
+        html += `
+        <div class="kpi-card ${code}">
+            <div class="kpi-label-row">
+                <span class="kpi-label">${meta.kpiLabel}</span>
+                <span class="kpi-badge badge-${meta.badgeClass}">${meta.label}</span>
+            </div>
+            <div class="kpi-content">
+                <div class="kpi-subcard">
+                    <div class="kpi-number">${g.mains.size}</div>
+                    <div class="kpi-unit">กองทุนหลัก (Distinct)</div>
+                </div>
+                <div class="kpi-divider"></div>
+                <div class="kpi-subcard">
+                    <div class="kpi-number">${g.sub}</div>
+                    <div class="kpi-unit">กองทุนย่อยทั้งหมด</div>
+                </div>
+            </div>
+        </div>`;
+    });
+    html += `
+    <div class="kpi-card total">
+        <div class="kpi-label-row">
+            <span class="kpi-label">สรุปภาพรวมทั้งหมด</span>
+            <span class="kpi-badge badge-total">Grand Total</span>
+        </div>
+        <div class="kpi-content">
+            <div class="kpi-subcard">
+                <div class="kpi-number">${totalMains}</div>
+                <div class="kpi-unit">กองทุนหลักสะสม (Distinct)</div>
+            </div>
+            <div class="kpi-divider"></div>
+            <div class="kpi-subcard">
+                <div class="kpi-number">${totalSub}</div>
+                <div class="kpi-unit">รายการกองทุนย่อยรวม</div>
+            </div>
+        </div>
+    </div>`;
+    grid.innerHTML = html;
+    document.getElementById('headerBadge').textContent = `จำนวนข้อมูลทั้งหมด: ${totalSub} รายการ`;
+}
+
+function escapeHtml(s) {
+    return (s || '').toString()
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function renderTable() {
+    const search = document.getElementById('tableSearch').value.toUpperCase();
+    const filter = document.getElementById('statusFilter').value;
+    const tbody = document.getElementById('tableBody');
+    let html = '';
+    records.forEach((r, idx) => {
+        const code = statusCodeFromLabel(r.statusLabel);
+        if (filter !== 'all' && code !== filter) return;
+        const haystack = [r.category, r.mainFund, r.subFund, r.statusLabel, r.note3, r.note4].join(' ').toUpperCase();
+        if (search && haystack.indexOf(search) === -1) return;
+        html += `<tr data-idx="${idx}">
+            <td class="col-no">${idx + 1}</td>
+            <td contenteditable="true" data-field="category" onblur="updateField(${idx},'category',this.textContent)">${escapeHtml(r.category)}</td>
+            <td contenteditable="true" data-field="mainFund" onblur="updateField(${idx},'mainFund',this.textContent)">${escapeHtml(r.mainFund)}</td>
+            <td contenteditable="true" data-field="subFund" onblur="updateField(${idx},'subFund',this.textContent)">${escapeHtml(r.subFund)}</td>
+            <td class="col-status">
+                <select class="status-select" onchange="updateStatus(${idx}, this.value)">
+                    ${Object.keys(STATUS_META).map(c => `<option value="${c}" ${c === code ? 'selected' : ''}>${STATUS_META[c].label}</option>`).join('')}
+                </select>
+            </td>
+            <td contenteditable="true" data-field="note3" onblur="updateField(${idx},'note3',this.textContent)">${escapeHtml(r.note3)}</td>
+            <td contenteditable="true" data-field="note4" onblur="updateField(${idx},'note4',this.textContent)">${escapeHtml(r.note4)}</td>
+            <td class="col-action"><button class="row-delete-btn" onclick="deleteRow(${idx})" title="ลบแถวนี้">✕</button></td>
+        </tr>`;
+    });
+    tbody.innerHTML = html;
+}
+
+function updateField(idx, field, value) {
+    records[idx][field] = value.trim();
+    renderKPI();
+}
+
+function updateStatus(idx, code) {
+    records[idx].statusLabel = STATUS_META[code].label;
+    renderKPI();
+    renderTable();
+}
+
+function addRow() {
+    records.push({ no: records.length + 1, category: '', mainFund: '', subFund: '', statusLabel: STATUS_META['done'].label, note3: '', note4: '' });
+    renderKPI();
+    renderTable();
+}
+
+function deleteRow(idx) {
+    records.splice(idx, 1);
+    renderKPI();
+    renderTable();
+}
+
+function csvEscape(v) {
+    v = (v === undefined || v === null) ? '' : String(v);
+    if (v.includes(',') || v.includes('"') || v.includes('\n')) {
+        return '"' + v.replace(/"/g, '""') + '"';
+    }
+    return v;
+}
+
+function exportCSV() {
+    const header = ['ลำดับ', 'รายการสรุปผลสำเร็จการทำงาน', 'รายละเอียด', 'คำอธิบายเพิ่มเติม1', 'คำอธิบายเพิ่มเติม2', 'คำอธิบายเพิ่มเติม3', 'คำอธิบายเพิ่มเติม4'];
+    const lines = [header.map(csvEscape).join(',')];
+    records.forEach((r, i) => {
+        lines.push([i + 1, r.category, r.mainFund, r.subFund, r.statusLabel, r.note3, r.note4].map(csvEscape).join(','));
+    });
+    const csvContent = '\uFEFF' + lines.join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'vitanix_claim_data.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function parseCSVLine(line) {
+    const result = [];
+    let cur = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (inQuotes) {
+            if (ch === '"') {
+                if (line[i + 1] === '"') { cur += '"'; i++; }
+                else { inQuotes = false; }
+            } else { cur += ch; }
+        } else {
+            if (ch === '"') inQuotes = true;
+            else if (ch === ',') { result.push(cur); cur = ''; }
+            else cur += ch;
+        }
+    }
+    result.push(cur);
+    return result;
+}
+
+function parseCSV(text) {
+    text = text.replace(/^\uFEFF/, '');
+    const rawLines = text.split(/\r\n|\n|\r/).filter(l => l.length > 0);
+    if (rawLines.length === 0) return [];
+    const rows = rawLines.map(parseCSVLine);
+    const dataRows = rows.slice(1); // skip header
+    return dataRows.map(cols => ({
+        no: cols[0] || '',
+        category: cols[1] || '',
+        mainFund: cols[2] || '',
+        subFund: cols[3] || '',
+        statusLabel: cols[4] || STATUS_META['done'].label,
+        note3: cols[5] || '',
+        note4: cols[6] || ''
+    }));
+}
+
+function importCSV(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const parsed = parseCSV(e.target.result);
+            if (parsed.length === 0) { alert('ไม่พบข้อมูลในไฟล์ CSV'); return; }
+            records = parsed;
+            renderKPI();
+            renderTable();
+            alert(`นำเข้าข้อมูลสำเร็จ ${parsed.length} รายการ`);
+        } catch (err) {
+            alert('เกิดข้อผิดพลาดในการอ่านไฟล์ CSV: ' + err.message);
+        }
+    };
+    reader.readAsText(file, 'UTF-8');
+    event.target.value = '';
+}
+
+renderKPI();
+renderTable();
+</script>
+
+</body>
+</html>
